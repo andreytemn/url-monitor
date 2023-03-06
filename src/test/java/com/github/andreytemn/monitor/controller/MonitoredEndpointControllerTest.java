@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.andreytemn.monitor.model.MonitoredEndpoint;
 import com.github.andreytemn.monitor.model.MonitoredEndpointRequest;
 import com.github.andreytemn.monitor.service.MonitoredEndpointService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -26,8 +26,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(MockitoJUnitRunner.class)
-public class MonitoredEndpointControllerTest {
+@ExtendWith(MockitoExtension.class)
+class MonitoredEndpointControllerTest {
 
     private MockMvc mockMvc;
 
@@ -37,13 +37,13 @@ public class MonitoredEndpointControllerTest {
     @InjectMocks
     private MonitoredEndpointController monitoredEndpointController;
 
-    @Before
+    @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(monitoredEndpointController).build();
     }
 
     @Test
-    public void testCreateMonitoredEndpoint() throws Exception {
+    void testCreateMonitoredEndpoint() throws Exception {
         MonitoredEndpointRequest request = new MonitoredEndpointRequest("Google", "https://www.google.com", 60);
 
         MonitoredEndpoint monitoredEndpoint = MonitoredEndpoint.builder()
@@ -68,7 +68,7 @@ public class MonitoredEndpointControllerTest {
     }
 
     @Test
-    public void testUpdateMonitoredEndpoint() throws Exception {
+    void testUpdateMonitoredEndpoint() throws Exception {
         MonitoredEndpointRequest request = new MonitoredEndpointRequest("Google Updated", "https://www.google.com", 120);
 
         MonitoredEndpoint monitoredEndpoint = MonitoredEndpoint.builder()
@@ -94,7 +94,7 @@ public class MonitoredEndpointControllerTest {
     }
 
     @Test
-    public void testDeleteMonitoredEndpoint() throws Exception {
+    void testDeleteMonitoredEndpoint() throws Exception {
         MonitoredEndpoint monitoredEndpoint = MonitoredEndpoint.builder()
                 .id(UUID.randomUUID())
                 .name("Google")
@@ -109,7 +109,7 @@ public class MonitoredEndpointControllerTest {
     }
 
     @Test
-    public void testGetMonitoredEndpointById() throws Exception {
+    void testGetMonitoredEndpointById() throws Exception {
         UUID id = UUID.randomUUID();
 
         MonitoredEndpoint monitoredEndpoint = MonitoredEndpoint.builder()
@@ -134,7 +134,7 @@ public class MonitoredEndpointControllerTest {
 
 
     @Test
-    public void testGetAllMonitoredEndpoints() throws Exception {
+    void testGetAllMonitoredEndpoints() throws Exception {
         MonitoredEndpoint monitoredEndpoint1 = MonitoredEndpoint.builder()
                 .id(UUID.randomUUID())
                 .name("Google")
