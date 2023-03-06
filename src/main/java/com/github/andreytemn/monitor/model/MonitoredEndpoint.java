@@ -1,9 +1,8 @@
 package com.github.andreytemn.monitor.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,7 +13,8 @@ import java.util.UUID;
  * Represents the endpoint to monitor.
  */
 @Entity
-@Builder
+@Builder(toBuilder = true)
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "monitored_endpoint")
@@ -35,9 +35,12 @@ public class MonitoredEndpoint {
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @Column(name = "monitored_interval", nullable = false)
     private Integer monitoredInterval;
 
