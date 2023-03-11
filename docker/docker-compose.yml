@@ -1,7 +1,7 @@
 version: '3'
 services:
   mysql:
-    image: localhost
+    image: mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword

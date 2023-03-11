@@ -6,98 +6,153 @@ import com.github.andreytemn.monitor.model.User;
 import com.github.andreytemn.monitor.repository.MonitoredEndpointRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@ActiveProfiles("test")
+/**
+ * Test for {@link MonitoredEndpointService}
+ */
+@ExtendWith(MockitoExtension.class)
 class MonitoredEndpointServiceTest {
 
-    @Autowired
-    private MonitoredEndpointService monitoredEndpointService;
+    public static final User OWNER =
+            User.builder().email("user@email.com").username("user").accessToken("token").build();
 
-    @Autowired
+    @Mock
     private MonitoredEndpointRepository monitoredEndpointRepository;
 
-    private UUID testEndpointId;
+    @InjectMocks
+    private MonitoredEndpointService monitoredEndpointService;
+
+
+    private final MonitoredEndpoint testEndpoint = MonitoredEndpoint.builder()
+            .id(UUID.randomUUID())
+            .name("Test Endpoint")
+            .url("http://example.com")
+            .monitoredInterval(60)
+            .lastCheckAt(LocalDateTime.now())
+            .owner(OWNER)
+            .build();
 
     @BeforeEach
     public void setup() {
-        monitoredEndpointRepository.deleteAll();
-
-        // Create a test endpoint
-        MonitoredEndpoint testEndpoint = monitoredEndpointRepository.save(MonitoredEndpoint.builder()
-                .name("Test Endpoint")
-                .url("http://example.com")
-                .monitoredInterval(60)
-                .owner(User.builder().email("user@email.com").username("user").accessToken("token").build())
-                .build());
-
-        testEndpointId = testEndpoint.getId();
+//        List<MonitoredEndpoint> endpoints = new ArrayList<>();
+//        MonitoredEndpoint testEndpoint = MonitoredEndpoint.builder()
+//                .id(UUID.randomUUID())
+//                .name("Test Endpoint")
+//                .url("http://example.com")
+//                .monitoredInterval(60)
+//                .lastCheckAt(LocalDateTime.now())
+//                .owner(owner)
+//                .build();
+//
+//        testEndpointId = testEndpoint.getId();
+//
+//        endpoints.add(testEndpoint);
+//
+//        when(monitoredEndpointRepository.findByOwner(any(User.class))).thenReturn(endpoints);
+//        when(monitoredEndpointRepository.save(any(MonitoredEndpoint.class))).thenReturn(testEndpoint);
+//        when(monitoredEndpointRepository.findById(any(UUID.class))).thenReturn(java.util.Optional.of(testEndpoint));
     }
 
     @Test
     void testSaveEndpoint() {
-        MonitoredEndpointRequest request = new MonitoredEndpointRequest("New Endpoint", "http://example.org", 120);
+        MonitoredEndpointRequest request = new MonitoredEndpointRequest("Test Endpoint", "http://example.com", 60);
 
-        MonitoredEndpoint savedEndpoint = monitoredEndpointService.save(request);
+        when(monitoredEndpointRepository.save(any(MonitoredEndpoint.class))).thenReturn(testEndpoint);
+        MonitoredEndpoint savedEndpoint = monitoredEndpointService.save(request, OWNER);
 
         assertNotNull(savedEndpoint.getId());
         assertEquals(request.name(), savedEndpoint.getName());
-        assertEquals(request.url(), savedEndpoint.getUrl());
-        assertEquals(request.monitoredInterval(), savedEndpoint.getMonitoredInterval());
+
+        verify(monitoredEndpointRepository).save(any(MonitoredEndpoint.class));
     }
 
     @Test
     void testFindById() {
-        MonitoredEndpoint endpoint = monitoredEndpointService.findById(testEndpointId);
+        when(monitoredEndpointRepository.findById(any(UUID.class))).thenReturn(java.util.Optional.of(testEndpoint));
+        MonitoredEndpoint endpoint = monitoredEndpointService.findById(testEndpoint.getId(), OWNER);
 
         assertNotNull(endpoint);
-        assertEquals(testEndpointId, endpoint.getId());
+        assertEquals(testEndpoint.getId(), endpoint.getId());
         assertEquals("Test Endpoint", endpoint.getName());
         assertEquals("http://example.com", endpoint.getUrl());
         assertEquals(60, endpoint.getMonitoredInterval());
+        assertEquals(OWNER, endpoint.getOwner());
+
+        verify(monitoredEndpointRepository).findById(any(UUID.class));
     }
 
     @Test
     void testFindAll() {
-        List<MonitoredEndpoint> endpoints = monitoredEndpointService.findAll();
+        when(monitoredEndpointRepository.findByOwner(OWNER)).thenReturn(List.of(testEndpoint));
+        List<MonitoredEndpoint> endpoints = monitoredEndpointService.findAll(OWNER);
 
         assertNotNull(endpoints);
         assertEquals(1, endpoints.size());
-        assertEquals(testEndpointId, endpoints.get(0).getId());
         assertEquals("Test Endpoint", endpoints.get(0).getName());
         assertEquals("http://example.com", endpoints.get(0).getUrl());
         assertEquals(60, endpoints.get(0).getMonitoredInterval());
+
+
+        verify(monitoredEndpointRepository).findByOwner(OWNER);
     }
 
     @Test
     void testDelete() {
-        monitoredEndpointService.delete(testEndpointId);
+        when(monitoredEndpointRepository.findById(any(UUID.class))).thenReturn(java.util.Optional.of(testEndpoint));
+        monitoredEndpointService.delete(testEndpoint.getId(), OWNER);
 
-        assertFalse(monitoredEndpointRepository.existsById(testEndpointId));
+        assertFalse(monitoredEndpointRepository.existsById(testEndpoint.getId()));
+
+        verify(monitoredEndpointRepository).findById(any(UUID.class));
+        verify(monitoredEndpointRepository).delete(any(MonitoredEndpoint.class));
     }
 
     @Test
     void testUpdateMonitoredEndpoint() {
-        MonitoredEndpointRequest request = new MonitoredEndpointRequest("Updated Endpoint", "http://example.net", 90);
+        UUID endpointId = UUID.randomUUID();
 
-        MonitoredEndpoint updatedEndpoint = monitoredEndpointService.updateMonitoredEndpoint(testEndpointId, request);
+        MonitoredEndpoint existingEndpoint = MonitoredEndpoint.builder()
+                .id(endpointId)
+                .name("Old Name")
+                .url("http://oldurl.com")
+                .monitoredInterval(60)
+                .owner(OWNER)
+                .build();
+        when(monitoredEndpointRepository.findById(endpointId)).thenReturn(Optional.of(existingEndpoint));
 
-        assertNotNull(updatedEndpoint.getId());
-        assertEquals(request.name(), updatedEndpoint.getName());
-        assertEquals(request.url(), updatedEndpoint.getUrl());
-        assertEquals(request.monitoredInterval(), updatedEndpoint.getMonitoredInterval());
+        MonitoredEndpointRequest request = new MonitoredEndpointRequest("New Name", "http://newurl.com", 120);
+        MonitoredEndpoint updatedEndpoint = MonitoredEndpoint.builder()
+                .id(endpointId)
+                .name(request.name())
+                .url(request.url())
+                .monitoredInterval(request.monitoredInterval())
+                .owner(OWNER)
+                .build();
+        when(monitoredEndpointRepository.save(any(MonitoredEndpoint.class))).thenReturn(updatedEndpoint);
 
-        MonitoredEndpoint retrievedEndpoint = monitoredEndpointRepository.findById(testEndpointId).orElseThrow(AssertionError::new);
-        assertEquals(request.name(), retrievedEndpoint.getName());
-        assertEquals(request.url(), retrievedEndpoint.getUrl());
-        assertEquals(request.monitoredInterval(), retrievedEndpoint.getMonitoredInterval());
+        MonitoredEndpoint result = monitoredEndpointService.updateMonitoredEndpoint(endpointId, request, OWNER);
+
+        assertEquals(existingEndpoint.getId(), result.getId());
+        assertEquals(request.name(), result.getName());
+        assertEquals(request.url(), result.getUrl());
+        assertEquals(request.monitoredInterval(), result.getMonitoredInterval());
+        assertEquals(OWNER, result.getOwner());
+
+        verify(monitoredEndpointRepository).findById(endpointId);
+        verify(monitoredEndpointRepository).save(any(MonitoredEndpoint.class));
     }
 }

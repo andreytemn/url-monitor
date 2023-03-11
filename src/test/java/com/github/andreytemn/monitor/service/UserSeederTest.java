@@ -25,11 +25,6 @@ class UserSeederTest {
     @Autowired
     private UserSeeder userSeeder;
 
-    @BeforeEach
-    public void setUp() {
-        userRepository.deleteAll();
-    }
-
     @Test
     void testSeedUsers() {
         userSeeder.run();

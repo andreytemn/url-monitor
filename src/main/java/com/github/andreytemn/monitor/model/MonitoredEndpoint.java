@@ -35,10 +35,13 @@ public class MonitoredEndpoint {
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
-
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @Column(name = "last_check_at", nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    private LocalDateTime lastCheckAt;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @Column(name = "monitored_interval", nullable = false)
