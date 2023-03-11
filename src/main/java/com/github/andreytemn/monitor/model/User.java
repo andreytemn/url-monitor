@@ -3,6 +3,7 @@ package com.github.andreytemn.monitor.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
@@ -13,6 +14,7 @@ import java.util.UUID;
  * Represents the user of the service.
  */
 @Entity
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
