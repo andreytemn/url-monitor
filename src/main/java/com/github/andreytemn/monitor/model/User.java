@@ -31,7 +31,7 @@ public class User {
 
     @Column(name = "access_token", nullable = false)
     private String accessToken;
-
+    @Builder.Default
     @OneToMany(mappedBy = "owner")
     private Set<MonitoredEndpoint> monitoredEndpoints = new HashSet<>();
 }
