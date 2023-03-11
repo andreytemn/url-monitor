@@ -1,11 +1,11 @@
-CREATE TABLE user (
+CREATE TABLE IF NOT EXISTS user(
   id BINARY(16) PRIMARY KEY,
   username VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL,
   access_token VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE monitored_endpoint (
+CREATE TABLE IF NOT EXISTS monitored_endpoint (
   id BINARY(16) PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   url VARCHAR(255) NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE monitored_endpoint (
   CONSTRAINT `fk_monitored_endpoint_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
 );
 
-CREATE TABLE monitoring_result (
+CREATE TABLE IF NOT EXISTS monitoring_result (
   id BINARY(16) PRIMARY KEY,
   check_date DATETIME NOT NULL,
   status_code INT NOT NULL,
