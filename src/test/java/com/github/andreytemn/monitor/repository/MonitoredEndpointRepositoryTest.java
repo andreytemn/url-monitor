@@ -2,6 +2,9 @@ package com.github.andreytemn.monitor.repository;
 
 import com.github.andreytemn.monitor.model.MonitoredEndpoint;
 import com.github.andreytemn.monitor.model.User;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,12 @@ class MonitoredEndpointRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @AfterEach
+    void cleanUp() {
+        monitoredEndpointRepository.deleteAll();
+        userRepository.deleteAll();
+    }
 
     @Test
     void testFindByOwner() {

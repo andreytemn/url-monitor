@@ -46,27 +46,6 @@ class MonitoredEndpointServiceTest {
             .owner(OWNER)
             .build();
 
-    @BeforeEach
-    public void setup() {
-//        List<MonitoredEndpoint> endpoints = new ArrayList<>();
-//        MonitoredEndpoint testEndpoint = MonitoredEndpoint.builder()
-//                .id(UUID.randomUUID())
-//                .name("Test Endpoint")
-//                .url("http://example.com")
-//                .monitoredInterval(60)
-//                .lastCheckAt(LocalDateTime.now())
-//                .owner(owner)
-//                .build();
-//
-//        testEndpointId = testEndpoint.getId();
-//
-//        endpoints.add(testEndpoint);
-//
-//        when(monitoredEndpointRepository.findByOwner(any(User.class))).thenReturn(endpoints);
-//        when(monitoredEndpointRepository.save(any(MonitoredEndpoint.class))).thenReturn(testEndpoint);
-//        when(monitoredEndpointRepository.findById(any(UUID.class))).thenReturn(java.util.Optional.of(testEndpoint));
-    }
-
     @Test
     void testSaveEndpoint() {
         MonitoredEndpointRequest request = new MonitoredEndpointRequest("Test Endpoint", "http://example.com", 60);

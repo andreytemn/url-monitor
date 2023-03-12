@@ -1,10 +1,12 @@
 package com.github.andreytemn.monitor.repository;
 
 import com.github.andreytemn.monitor.model.User;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.containers.MySQLContainer;
@@ -30,6 +32,11 @@ class UserRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @AfterEach
+    void cleanUp() {
+        userRepository.deleteAll();
+    }
 
     @Test
     void testFindByAccessToken() {
