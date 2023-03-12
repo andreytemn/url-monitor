@@ -3,6 +3,7 @@ package com.github.andreytemn.monitor.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.util.UUID;
  */
 @Entity
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "monitoring_result")
@@ -25,10 +27,10 @@ public class MonitoringResult {
     @Column(name = "check_date", nullable = false)
     private LocalDateTime checkDate;
 
-    @Column(name = "http_status_code", nullable = false)
+    @Column(name = "status_code", nullable = false)
     private Integer httpStatusCode;
 
-    @Column
+    @Column(name = "payload", nullable = false)
     private String payload;
 
     @ManyToOne
