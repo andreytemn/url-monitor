@@ -10,7 +10,7 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import javax.sql.DataSource;
 
 /**
- * Provides a database schema on the application initialization. Uses teh schema.sql file by default.
+ * Provides a database schema on the application initialization. Uses the schema.sql file by default.
  */
 @Configuration
 public class DatabaseConfig {
