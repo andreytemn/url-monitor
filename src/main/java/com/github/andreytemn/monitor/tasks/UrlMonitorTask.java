@@ -17,6 +17,10 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Applies endpoint monitoring. The interval of running the task is one second, and it checks if the specified interval
+ * for the endpoint has already passed. The last checked date of the endpoint is updated accordingly.
+ */
 @Component
 public class UrlMonitorTask {
 
@@ -31,17 +35,23 @@ public class UrlMonitorTask {
 
     private final Map<UUID, MonitoredEndpoint> endpoints = new ConcurrentHashMap<>();
 
+    /**
+     * Init the collection of endpoints to monitor with the content of the according db table.
+     */
     @PostConstruct
     public void initEndpoints() {
         endpointRepository.findAll().forEach(it -> endpoints.put(it.getId(), it));
     }
 
+    /**
+     * Find the endpoint which monitoring interval has passed, commit the monitoring and note down the result.
+     */
     @Scheduled(fixedDelayString = "${monitoring.interval}")
     public void monitorEndpoints() {
         for (MonitoredEndpoint endpoint : endpoints.values()) {
             if (shouldCheckEndpoint(endpoint)) {
-                MonitoringResult monitoringResult = toMonitoringResult(restTemplate.getForEntity(endpoint.getUrl(),
-                        String.class), endpoint);
+                MonitoringResult monitoringResult =
+                        toMonitoringResult(restTemplate.getForEntity(endpoint.getUrl(), String.class), endpoint);
                 resultRepository.save(monitoringResult);
                 endpointRepository.save(endpoint.toBuilder().lastCheckAt(LocalDateTime.now()).build());
             }
