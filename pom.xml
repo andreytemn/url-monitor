@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.github.andreytemn</groupId>
 	<artifactId>url-monitor</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>URL Monitor</name>
 	<description>Monitor for URLs</description>
 	<properties>
