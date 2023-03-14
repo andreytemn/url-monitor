@@ -140,7 +140,6 @@ class MonitoredEndpointControllerTest {
 
     @Test
     void testGetAllMonitoredEndpoints() throws Exception {
-
         MonitoredEndpoint endpoint2 = MonitoredEndpoint.builder()
                 .id(UUID.randomUUID())
                 .name("Facebook")
@@ -179,6 +178,22 @@ class MonitoredEndpointControllerTest {
         mockMvc.perform(get("/endpoints")).andExpect(status().isBadRequest());
         mockMvc.perform(get("/endpoints/{id}", ID)).andExpect(status().isBadRequest());
         mockMvc.perform(delete("/endpoints/{id}", ID)).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testEndpointWithEmptyNameDiscarded() throws Exception {
+        MonitoredEndpointRequest request = new MonitoredEndpointRequest("", "https://www.google.com", 60);
+        mockMvc.perform(post("/endpoints")
+                        .contentType(APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(request))
+                        .header("AccessToken", "token"))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(put("/endpoints/{id}", UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(request))
+                        .header("AccessToken", "token"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
