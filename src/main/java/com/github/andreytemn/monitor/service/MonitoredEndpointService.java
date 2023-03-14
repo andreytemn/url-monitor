@@ -2,8 +2,10 @@ package com.github.andreytemn.monitor.service;
 
 import com.github.andreytemn.monitor.model.MonitoredEndpoint;
 import com.github.andreytemn.monitor.model.MonitoredEndpointRequest;
+import com.github.andreytemn.monitor.model.MonitoringResult;
 import com.github.andreytemn.monitor.model.User;
 import com.github.andreytemn.monitor.repository.MonitoredEndpointRepository;
+import com.github.andreytemn.monitor.repository.MonitoringResultRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,9 @@ public class MonitoredEndpointService {
 
     @Autowired
     private MonitoredEndpointRepository monitoredEndpointRepository;
+
+    @Autowired
+    private MonitoringResultRepository monitoringResultRepository;
 
     public MonitoredEndpoint save(MonitoredEndpointRequest monitoredEndpoint, User owner) {
         return monitoredEndpointRepository.save(MonitoredEndpoint.builder()
@@ -54,5 +59,9 @@ public class MonitoredEndpointService {
                 .build();
 
         return monitoredEndpointRepository.save(existingEndpoint);
+    }
+
+    public List<MonitoringResult> getMonitoringResults(MonitoredEndpoint endpoint) {
+        return monitoringResultRepository.findTop10ByMonitoredEndpointOrderByCheckDateDesc(endpoint);
     }
 }

@@ -2,6 +2,7 @@ package com.github.andreytemn.monitor.controller;
 
 import com.github.andreytemn.monitor.model.MonitoredEndpoint;
 import com.github.andreytemn.monitor.model.MonitoredEndpointRequest;
+import com.github.andreytemn.monitor.model.MonitoringResult;
 import com.github.andreytemn.monitor.service.MonitoredEndpointService;
 import com.github.andreytemn.monitor.service.UserService;
 import jakarta.validation.Valid;
@@ -32,6 +33,13 @@ public class MonitoredEndpointController {
     @GetMapping
     public List<MonitoredEndpoint> getAllMonitoredEndpoints(@RequestHeader("AccessToken") String accessToken) {
         return monitoredEndpointService.findAll(userService.validateAccessToken(accessToken));
+    }
+
+    @GetMapping("/{id}/results")
+    public List<MonitoringResult> getMonitoringResults(@PathVariable UUID id,
+                                                       @RequestHeader("AccessToken") String accessToken) {
+        return monitoredEndpointService.getMonitoringResults(monitoredEndpointService.findById(id,
+                userService.validateAccessToken(accessToken)));
     }
 
     @GetMapping("/{id}")

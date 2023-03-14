@@ -3,6 +3,7 @@ package com.github.andreytemn.monitor.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.andreytemn.monitor.model.MonitoredEndpoint;
 import com.github.andreytemn.monitor.model.MonitoredEndpointRequest;
+import com.github.andreytemn.monitor.model.MonitoringResult;
 import com.github.andreytemn.monitor.model.User;
 import com.github.andreytemn.monitor.service.MonitoredEndpointService;
 import com.github.andreytemn.monitor.service.UserService;
@@ -18,6 +19,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,8 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test for {@link MonitoredEndpointController}
@@ -194,6 +196,32 @@ class MonitoredEndpointControllerTest {
                         .content(new ObjectMapper().writeValueAsString(request))
                         .header("AccessToken", "token"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testGetMonitoringResults() throws Exception {
+        when(userService.validateAccessToken("token")).thenReturn(USER);
+        when(monitoredEndpointService.findById(ID, USER)).thenReturn(ENDPOINT);
+
+        List<MonitoringResult> expectedResults = new ArrayList<>();
+        expectedResults.add(new MonitoringResult(UUID.randomUUID(), LocalDateTime.now(), 200, "", ENDPOINT));
+        expectedResults.add(new MonitoringResult(UUID.randomUUID(), LocalDateTime.now(), 404, "", ENDPOINT));
+        expectedResults.add(new MonitoringResult(UUID.randomUUID(), LocalDateTime.now(), 500, "", ENDPOINT));
+        when(monitoredEndpointService.getMonitoringResults(ENDPOINT)).thenReturn(expectedResults);
+
+        mockMvc.perform(get("/endpoints/{id}/results", ID)
+                        .header("AccessToken", "token")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].checkDate").exists())
+                .andExpect(jsonPath("$[0].httpStatusCode").value(200))
+                .andExpect(jsonPath("$[1].httpStatusCode").value(404))
+                .andExpect(jsonPath("$[2].httpStatusCode").value(500))
+                .andExpect(jsonPath("$[0].payload").exists())
+                .andExpect(jsonPath("$[0].monitoredEndpoint.id").value(ID.toString()));
     }
 
     @Test
