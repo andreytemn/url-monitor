@@ -36,6 +36,7 @@ public class DatabaseConfig {
 
         ResourceDatabasePopulator populate = new ResourceDatabasePopulator();
         populate.addScript(new ClassPathResource("schema.sql"));
+        populate.addScript(new ClassPathResource("data.sql"));
         populate.execute(dataSource);
 
         return dataSource;
