@@ -5,6 +5,7 @@ import com.github.andreytemn.monitor.model.MonitoringResult;
 import com.github.andreytemn.monitor.repository.MonitoredEndpointRepository;
 import com.github.andreytemn.monitor.repository.MonitoringResultRepository;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * for the endpoint has already passed. The last checked date of the endpoint is updated accordingly.
  */
 @Component
+@Slf4j
 public class UrlMonitorTask {
 
     @Autowired
@@ -49,7 +51,9 @@ public class UrlMonitorTask {
     @Scheduled(fixedDelayString = "${monitoring.interval}")
     public void monitorEndpoints() {
         for (MonitoredEndpoint endpoint : endpoints.values()) {
+            log.debug("Monitoring at {}", LocalDateTime.now());
             if (shouldCheckEndpoint(endpoint)) {
+                log.debug("Monitoring {}", endpoint);
                 MonitoringResult monitoringResult =
                         toMonitoringResult(restTemplate.getForEntity(endpoint.getUrl(), String.class), endpoint);
                 resultRepository.save(monitoringResult);
