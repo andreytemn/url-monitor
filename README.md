@@ -23,6 +23,74 @@ The service will be available on `localhost:8080/endpoints`. It is seeded with t
 
     Batman: batman@example.com, accessToken: dcb20f8a-5657-4f1b-9f7f-ce65739b359e
 
+## Examples of requests
+
+Get the monitored endpoints for the user:
+```
+GET localhost:8080/endpoints
+
+Headers
+AccessToken: 93f39e2f-80de-4033-99ee-249d92736a25
+```
+Create a new endpoint
+```
+
+POST localhost:8080/endpoints
+
+Headers
+AccessToken: 93f39e2f-80de-4033-99ee-249d92736a25
+
+Body
+{
+  "name": "Example Endpoint",
+  "url": "http://example.com",
+  "monitoredInterval": 1
+}
+```
+
+Update the endpoint
+```
+PUT localhost:8080/endpoints/a1260f8a-5657-4f1b-9f7f-ce65739b7710
+
+Headers
+AccessToken: 93f39e2f-80de-4033-99ee-249d92736a25
+
+Body
+{
+  "name": "Example Endpoint",
+  "url": "http://example.com",
+  "monitoredInterval": 1
+}
+```
+Delete the endpoint
+```
+DELETE localhost:8080/endpoints/a1260f8a-5657-4f1b-9f7f-ce65739b7710
+
+Headers
+AccessToken: 93f39e2f-80de-4033-99ee-249d92736a25
+
+Body
+{
+  "name": "Endpoint",
+  "url": "http://google.com",
+  "monitoredInterval": 2
+}
+```
+Get monitoring results
+```
+DELETE localhost:8080/endpoints/a1260f8a-5657-4f1b-9f7f-ce65739b7710
+
+Headers
+AccessToken: 93f39e2f-80de-4033-99ee-249d92736a25
+
+Body
+{
+  "name": "Endpoint",
+  "url": "http://google.com",
+  "monitoredInterval": 2
+}
+```
+
 ## Authors
 
 [Andrei Temnikov](https://www.linkedin.com/in/andrei-temnikov-a39595103/)
