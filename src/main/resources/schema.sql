@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS monitoring_result (
   id BINARY(16) PRIMARY KEY,
   check_date DATETIME NOT NULL,
   status_code INT NOT NULL,
-  payload VARCHAR(255) NOT NULL,
+  payload TEXT NOT NULL,
   monitored_endpoint_id BINARY(16) NOT NULL,
   CONSTRAINT `fk_monitoring_result_monitored_endpoint` FOREIGN KEY (`monitored_endpoint_id`) REFERENCES `monitored_endpoint` (`id`)
 );
