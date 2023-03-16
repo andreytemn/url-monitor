@@ -32,7 +32,8 @@ services:
       - "8080:8080"
     depends_on:
       - mysql
-      - mysql-test
+#      - mysql-test
+    command: bash -c "while ! nc -z mysql 3306 && ! nc -z mysql-test 3306; do sleep 1; done; java -jar url-monitor-1.0.0.jar"
 volumes:
   dbdata:
   dbdata-test:
