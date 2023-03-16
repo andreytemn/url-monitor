@@ -140,6 +140,6 @@ public class MonitoredEndpointController {
     }
 
     private static String createErrorMessage(BindingResult result) {
-        return result.getFieldErrors().stream().map(FieldError::getDefaultMessage).collect(Collectors.joining());
+        return result.getFieldErrors().stream().map(FieldError::getDefaultMessage).collect(Collectors.joining(", "));
     }
 }
