@@ -1,5 +1,6 @@
 package com.github.andreytemn.monitor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import javax.sql.DataSource;
  * Provides a database schema on the application initialization. Uses the schema.sql file by default.
  */
 @Configuration
+@Slf4j
 public class DatabaseConfig {
     @Value("${spring.datasource.url}")
     private String url;
@@ -35,7 +37,9 @@ public class DatabaseConfig {
         dataSource.setPassword(password);
 
         ResourceDatabasePopulator populate = new ResourceDatabasePopulator();
+        log.debug("Initializing schema");
         populate.addScript(new ClassPathResource("schema.sql"));
+        log.debug("Seeding default users");
         populate.addScript(new ClassPathResource("data.sql"));
         populate.execute(dataSource);
 

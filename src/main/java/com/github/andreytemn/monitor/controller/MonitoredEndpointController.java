@@ -6,6 +6,7 @@ import com.github.andreytemn.monitor.model.MonitoringResult;
 import com.github.andreytemn.monitor.service.MonitoredEndpointService;
 import com.github.andreytemn.monitor.service.UserService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/endpoints")
 @Validated
+@Slf4j
 public class MonitoredEndpointController {
     @Autowired
     private MonitoredEndpointService monitoredEndpointService;
@@ -41,6 +43,7 @@ public class MonitoredEndpointController {
      */
     @GetMapping
     public List<MonitoredEndpoint> getAllMonitoredEndpoints(@RequestHeader("AccessToken") String accessToken) {
+        log.debug("Getting all monitored endpoints for the user");
         return monitoredEndpointService.findAll(userService.validateAccessToken(accessToken));
     }
 
@@ -54,6 +57,7 @@ public class MonitoredEndpointController {
     @GetMapping("/{id}/results")
     public List<MonitoringResult> getMonitoringResults(@PathVariable UUID id,
                                                        @RequestHeader("AccessToken") String accessToken) {
+        log.debug("Getting monitoring results for the endpoint with id {}", id);
         return monitoredEndpointService.getMonitoringResults(monitoredEndpointService.findById(id,
                 userService.validateAccessToken(accessToken)));
     }
@@ -68,6 +72,7 @@ public class MonitoredEndpointController {
     @GetMapping("/{id}")
     public MonitoredEndpoint getMonitoredEndpointById(@PathVariable UUID id,
                                                       @RequestHeader("AccessToken") String accessToken) {
+        log.debug("Getting monitored endpoint with id {}", id);
         return monitoredEndpointService.findById(id, userService.validateAccessToken(accessToken));
     }
 
@@ -83,6 +88,7 @@ public class MonitoredEndpointController {
     @PostMapping
     public MonitoredEndpoint createMonitoredEndpoint(@Valid @RequestBody MonitoredEndpointRequest monitoredEndpoint,
                                                      @RequestHeader("AccessToken") String accessToken) {
+        log.debug("Creating a monitored endpoint {}", monitoredEndpoint.toString());
         return monitoredEndpointService.save(monitoredEndpoint, userService.validateAccessToken(accessToken));
     }
 
@@ -98,6 +104,7 @@ public class MonitoredEndpointController {
     public MonitoredEndpoint updateMonitoredEndpoint(@PathVariable UUID id,
                                                      @Valid @RequestBody MonitoredEndpointRequest monitoredEndpoint,
                                                      @RequestHeader("AccessToken") String accessToken) {
+        log.debug("Update the monitored endpoint with id {} {}", id, monitoredEndpoint.toString());
         return monitoredEndpointService.updateMonitoredEndpoint(id, monitoredEndpoint,
                 userService.validateAccessToken(accessToken));
     }
@@ -105,12 +112,13 @@ public class MonitoredEndpointController {
     /**
      * Delete the {@link MonitoredEndpoint}
      *
-     * @param id                the id of the {@link MonitoredEndpoint} to delete
-     * @param accessToken       the token of the registered user
+     * @param id          the id of the {@link MonitoredEndpoint} to delete
+     * @param accessToken the token of the registered user
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteMonitoredEndpoint(@PathVariable UUID id, @RequestHeader("AccessToken") String accessToken) {
+        log.debug("Deleting a monitored endpoint with id{}", id);
         monitoredEndpointService.delete(id, userService.validateAccessToken(accessToken));
     }
 
