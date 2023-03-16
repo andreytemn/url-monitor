@@ -5,6 +5,7 @@ import com.github.andreytemn.monitor.model.MonitoredEndpointRequest;
 import com.github.andreytemn.monitor.model.MonitoringResult;
 import com.github.andreytemn.monitor.service.MonitoredEndpointService;
 import com.github.andreytemn.monitor.service.UserService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,6 +87,7 @@ public class MonitoredEndpointController {
      */
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
+    @Transactional
     public MonitoredEndpoint createMonitoredEndpoint(@Valid @RequestBody MonitoredEndpointRequest monitoredEndpoint,
                                                      @RequestHeader("AccessToken") String accessToken) {
         log.debug("Creating a monitored endpoint {}", monitoredEndpoint.toString());
@@ -101,6 +103,7 @@ public class MonitoredEndpointController {
      * @return the created {@link MonitoredEndpoint}
      */
     @PutMapping("/{id}")
+    @Transactional
     public MonitoredEndpoint updateMonitoredEndpoint(@PathVariable UUID id,
                                                      @Valid @RequestBody MonitoredEndpointRequest monitoredEndpoint,
                                                      @RequestHeader("AccessToken") String accessToken) {
@@ -117,6 +120,7 @@ public class MonitoredEndpointController {
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
     public void deleteMonitoredEndpoint(@PathVariable UUID id, @RequestHeader("AccessToken") String accessToken) {
         log.debug("Deleting a monitored endpoint with id{}", id);
         monitoredEndpointService.delete(id, userService.validateAccessToken(accessToken));
@@ -130,6 +134,7 @@ public class MonitoredEndpointController {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
+        log.info("Handling bad request", ex);
         return ResponseEntity.badRequest().body(ErrorResponse.builder(ex, HttpStatus.BAD_REQUEST,
                 createErrorMessage(ex.getBindingResult())).build());
     }

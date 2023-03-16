@@ -3,8 +3,6 @@ package com.github.andreytemn.monitor.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -30,7 +28,4 @@ public class User {
 
     @Column(name = "access_token", nullable = false)
     private String accessToken;
-    @Builder.Default
-    @OneToMany(mappedBy = "owner")
-    private Set<MonitoredEndpoint> monitoredEndpoints = new HashSet<>();
 }

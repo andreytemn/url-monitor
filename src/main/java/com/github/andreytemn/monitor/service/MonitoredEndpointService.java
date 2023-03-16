@@ -56,7 +56,7 @@ public class MonitoredEndpointService {
         MonitoredEndpoint endpoint =
                 monitoredEndpointRepository.findById(id).orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "MonitoredEndpoint not found"));
-        if (!endpoint.getOwner().equals(owner)) {
+        if (!endpoint.getOwner().getId().equals(owner.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "MonitoredEndpoint does not belong to this user");
         }
         return endpoint;
