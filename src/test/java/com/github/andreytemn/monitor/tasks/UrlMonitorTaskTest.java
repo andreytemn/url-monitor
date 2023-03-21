@@ -75,7 +75,6 @@ class UrlMonitorTaskTest {
         when(restTemplate.getForEntity(endpoint1.getUrl(), String.class)).thenReturn(responseEntity1);
         when(restTemplate.getForEntity(endpoint2.getUrl(), String.class)).thenReturn(responseEntity2);
 
-        urlMonitorTask.initEndpoints();
         urlMonitorTask.monitorEndpoints();
 
         verify(resultRepository, times(2)).save(any(MonitoringResult.class));

@@ -4,7 +4,6 @@ import com.github.andreytemn.monitor.model.MonitoredEndpoint;
 import com.github.andreytemn.monitor.model.MonitoringResult;
 import com.github.andreytemn.monitor.repository.MonitoredEndpointRepository;
 import com.github.andreytemn.monitor.repository.MonitoringResultRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -34,23 +31,13 @@ public class UrlMonitorTask {
     @Autowired
     private MonitoringResultRepository resultRepository;
 
-    private List<MonitoredEndpoint> endpoints = new ArrayList<>();
-
-    /**
-     * Init the collection of endpoints to monitor with the content of the according db table.
-     */
-    @PostConstruct
-    public void initEndpoints() {
-        endpoints = endpointRepository.findAll();
-    }
-
     /**
      * Find the endpoint which monitoring interval has passed, commit the monitoring and note down the result.
      */
     @Scheduled(fixedDelayString = "${monitoring.interval}")
     public void monitorEndpoints() {
         log.debug("Attempting monitoring");
-        endpoints.stream().filter(this::shouldCheckEndpoint).forEach(this::monitor);
+        endpointRepository.findAll().stream().filter(this::shouldCheckEndpoint).forEach(this::monitor);
     }
 
     private void monitor(MonitoredEndpoint endpoint) {
