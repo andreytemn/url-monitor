@@ -13,10 +13,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Applies endpoint monitoring. The interval of running the task is one second, and it checks if the specified interval
@@ -35,14 +34,14 @@ public class UrlMonitorTask {
     @Autowired
     private MonitoringResultRepository resultRepository;
 
-    private final Map<UUID, MonitoredEndpoint> endpoints = new ConcurrentHashMap<>();
+    private List<MonitoredEndpoint> endpoints = new ArrayList<>();
 
     /**
      * Init the collection of endpoints to monitor with the content of the according db table.
      */
     @PostConstruct
     public void initEndpoints() {
-        endpointRepository.findAll().forEach(it -> endpoints.put(it.getId(), it));
+        endpoints = endpointRepository.findAll();
     }
 
     /**
@@ -50,16 +49,24 @@ public class UrlMonitorTask {
      */
     @Scheduled(fixedDelayString = "${monitoring.interval}")
     public void monitorEndpoints() {
-        for (MonitoredEndpoint endpoint : endpoints.values()) {
-            log.debug("Monitoring at {}", LocalDateTime.now());
-            if (shouldCheckEndpoint(endpoint)) {
-                log.debug("Monitoring {}", endpoint);
-                MonitoringResult monitoringResult =
-                        toMonitoringResult(restTemplate.getForEntity(endpoint.getUrl(), String.class), endpoint);
-                resultRepository.save(monitoringResult);
-                endpointRepository.save(endpoint.toBuilder().lastCheckAt(LocalDateTime.now()).build());
-            }
-        }
+        log.debug("Attempting monitoring");
+        endpoints.stream().filter(this::shouldCheckEndpoint).forEach(this::monitor);
+    }
+
+    private void monitor(MonitoredEndpoint endpoint) {
+        log.debug("Monitoring {}", endpoint);
+        MonitoringResult monitoringResult =
+                toMonitoringResult(queryEndpoint(endpoint), endpoint);
+        resultRepository.save(monitoringResult);
+        endpointRepository.save(updateLastCheckData(endpoint));
+    }
+
+    private static MonitoredEndpoint updateLastCheckData(MonitoredEndpoint endpoint) {
+        return endpoint.toBuilder().lastCheckAt(LocalDateTime.now()).build();
+    }
+
+    private ResponseEntity<String> queryEndpoint(MonitoredEndpoint endpoint) {
+        return restTemplate.getForEntity(endpoint.getUrl(), String.class);
     }
 
     private MonitoringResult toMonitoringResult(ResponseEntity<String> response, MonitoredEndpoint endpoint) {
@@ -75,5 +82,4 @@ public class UrlMonitorTask {
         return endpoint.getLastCheckAt() == null
                 || endpoint.getLastCheckAt().plusSeconds(endpoint.getMonitoredInterval()).isBefore(LocalDateTime.now());
     }
-
 }
