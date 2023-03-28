@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 class MonitoredEndpointServiceTest {
 
     private static final User OWNER =
-            User.builder().email("user@email.com").username("user").accessToken("token").build();
+            User.builder().id(UUID.randomUUID()).email("user@email.com").username("user").accessToken("token").build();
 
     private static final MonitoredEndpoint ENDPOINT = MonitoredEndpoint.builder()
             .id(UUID.randomUUID())
