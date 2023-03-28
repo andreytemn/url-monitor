@@ -23,6 +23,19 @@ The service will be available on `localhost:8080/endpoints`. It is seeded with t
 
     Batman: batman@example.com, accessToken: dcb20f8a-5657-4f1b-9f7f-ce65739b359e
 
+## Running tests
+
+Before running tests, you need to start the testing database. You can to it with the following command:
+
+```bash
+docker-compose up mysql-test
+```
+
+Then you can run the tests with maven:
+```bash
+mvn test
+```
+
 ## Examples of requests
 
 Get the monitored endpoints for the user:
